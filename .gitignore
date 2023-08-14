@@ -1,0 +1,15 @@
+# gradle
+.gradle/
+build
+
+
+# idea config
+.idea
+
+/node_modules
+.ds_store
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
