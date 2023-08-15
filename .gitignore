@@ -5,7 +5,7 @@ build
 
 # idea config
 .idea
-
+**/.vite/
 /node_modules
 .ds_store
 # Default ignored files
