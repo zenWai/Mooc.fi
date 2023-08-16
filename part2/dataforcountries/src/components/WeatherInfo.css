@@ -1,0 +1,24 @@
+.weather-info {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 300px;
+
+}
+
+.weather-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.weather-details {
+    margin-top: 1rem;
+    text-align: left;
+}
+
+.weather-details p {
+    margin: 0.5rem 0;
+}
