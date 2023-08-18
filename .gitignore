@@ -6,7 +6,7 @@ build
 # idea config
 .idea
 **/.vite/
-/node_modules
+**/node_modules/
 .ds_store
 # Default ignored files
 /shelf/

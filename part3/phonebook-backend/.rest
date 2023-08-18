@@ -1,0 +1,141 @@
+### Test if the root of the application is running on port 3003
+GET http://localhost:3003/
+
+> {%
+    client.test("Root endpoint responded successfully", function() {
+        client.assert(response.status === 200, "Response status from root is not 200");
+    });
+%}
+
+### Test the /info endpoint on port 3003
+GET http://localhost:3003/info
+
+> {%
+    client.test("Info endpoint responded successfully", function() {
+        client.assert(response.status === 200, "Response status from /info is not 200");
+    });
+
+    client.test("Response content-type is html", function() {
+        var type = response.contentType.mimeType;
+        client.assert(type === "text/html", "Expected 'text/html' but received '" + type + "'");
+    });
+%}
+
+### Test the /api/persons endpoint on port 3003
+GET http://localhost:3003/api/persons
+
+> {%
+    client.test("Persons endpoint responded successfully", function() {
+        client.assert(response.status === 200, "Response status from /api/persons is not 200");
+    });
+
+    client.test("Response content-type is json", function() {
+        var type = response.contentType.mimeType;
+        client.assert(type === "application/json", "Expected 'application/json' but received '" + type + "'");
+    });
+
+    client.test("Response contains Unique Name", function() {
+        client.assert(response.body.some(person => person.name === "Unique Name"), "UniqueName was not found in the response");
+    });
+%}
+
+### Attempt to retrieve a potentially non-existent person
+GET http://localhost:3003/api/persons/1
+
+> {%
+    client.test("Single person retrieval", function() {
+        if (response.status === 404) {
+            client.assert(true, "Person with ID 1 does not exist.");
+        } else {
+            client.assert(response.status === 200, "Unexpected response status");
+            client.assert(response.body.name === "Arto Hellas", "The retrieved person is not Arto Hellas");
+        }
+    });
+%}
+
+### Delete an entry with ID 1
+DELETE http://localhost:3003/api/persons/1
+
+> {%
+    client.test("Delete operation was successful", function() {
+        client.assert(response.status === 204, "Entry was not deleted successfully");
+    });
+%}
+
+### Check that the deleted person is no longer available
+GET http://localhost:3003/api/persons/1
+
+> {%
+    client.test("Deleted person is not retrievable", function() {
+        client.assert(response.status === 404, "Deleted person is still retrievable");
+    });
+%}
+### Delete an entry with name "Unique Name"
+DELETE http://localhost:3003/api/persons/name/Unique%20Name
+
+> {%
+    client.test("Delete by name operation was successful", function() {
+        client.assert(response.status === 204, "Entry was not deleted successfully by name");
+    });
+%}
+
+### Successful POST: Adding a new unique entry
+POST http://localhost:3003/api/persons
+Content-Type: application/json
+
+{
+  "name": "Unique Name",
+  "number": "555-555-5555"
+}
+
+> {%
+    client.test("Entry added successfully", function() {
+        client.assert(response.status === 201 || response.status === 200, "Failed to add new entry");
+    });
+%}
+
+### Failed POST: Missing name
+POST http://localhost:3003/api/persons
+Content-Type: application/json
+
+{
+  "number": "123-456-7890"
+}
+
+> {%
+    client.test("Failed to add entry without name", function() {
+        client.assert(response.status === 400, "Was able to add entry without name");
+        client.assert(response.body.error === "name or number is missing", "Incorrect error message");
+    });
+%}
+
+### Failed POST: Missing number
+POST http://localhost:3003/api/persons
+Content-Type: application/json
+
+{
+  "name": "Test User"
+}
+
+> {%
+    client.test("Failed to add entry without number", function() {
+        client.assert(response.status === 400, "Was able to add entry without number");
+        client.assert(response.body.error === "name or number is missing", "Incorrect error message");
+    });
+%}
+
+### Failed POST: Name already exists
+POST http://localhost:3003/api/persons
+Content-Type: application/json
+
+{
+  "name": "Unique Name",
+  "number": "123-456-7890"
+}
+
+> {%
+    client.test("Failed to add duplicate name", function() {
+        client.assert(response.status === 400, "Was able to add duplicate name");
+        client.assert(response.body.error === "name must be unique", "Incorrect error message for duplicate name");
+    });
+%}
