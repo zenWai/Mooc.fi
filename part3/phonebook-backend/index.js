@@ -1,6 +1,9 @@
 const express = require('express')
+const cors = require('cors');
 const morgan = require('morgan');
 const app = express();
+app.use(cors());
+app.use(express.static('dist'))
 app.use(express.json());
 // Create a new token for body data
 morgan.token('bodyData', function (req) {
@@ -115,7 +118,7 @@ app.post('/api/persons', (request, response) => {
 })
 
 
-const PORT = 3003
+const PORT = 3000
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
