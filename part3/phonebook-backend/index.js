@@ -1,124 +1,122 @@
-const express = require('express')
+const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const app = express();
+const Person = require('./models/person');
+const mongoose = require('mongoose');
 app.use(cors());
-app.use(express.static('dist'))
+app.use(express.static('dist'));
 app.use(express.json());
 // Create a new token for body data
 morgan.token('bodyData', function (req) {
-    return req.body ? JSON.stringify(req.body) : '';
+  return req.body ? JSON.stringify(req.body) : '';
 });
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :bodyData'));
 
-let persons = [
-    {
-        "id": 1,
-        "name": "Arto Hellas",
-        "number": "040-123456"
-    },
-    {
-        "id": 2,
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523"
-    },
-    {
-        "id": 3,
-        "name": "Dan Abramov",
-        "number": "12-43-234345"
-    },
-    {
-        "id": 4,
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122"
-    }
-]
 app.get('/', (request, response) => {
-    response.send('<h1>Hello World!</h1>')
-})
+  response.send('<h1>Hello World!</h1>');
+});
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
-})
-/*app.get('/api/notes/:id', (request, response) => {
-    const id = request.params.id
-    const note = notes.find(note => {
-        console.log(note.id, typeof note.id, id, typeof id, note.id === id)
-        return note.id === id
-    })
-    console.log(note)
-    response.json(note)
-})*/
-app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(person => person.id === id)
-    //404 error
+  Person.find({}).then(persons => {
+    response.json(persons);
+  });
+});
+
+app.get('/api/persons/:id', (request, response, next) => {
+  Person.findById(request.params.id).then(person => {
     if (person) {
-        response.json(person)
+      response.json(person);
     } else {
-        response.status(404).end()
+      response.status(404).end();
     }
-})
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    persons = persons.filter(person => person.id !== id)
-    response.status(204).end()
-})
-
-app.delete('/api/persons/name/:name', (request, response) => {
-    const name = decodeURI(request.params.name).trim();
-    const person = persons.find(person => person.name.toLowerCase() === name.toLowerCase());
-
-    if (person) {
-        persons = persons.filter(p => p.name.toLowerCase() !== name.toLowerCase());
+  }).catch(error => next(error)); // Passes to the error handling middleware
+});
+app.delete('/api/persons/:id', (request, response, next) => {
+  Person.findByIdAndRemove(request.params.id)
+    .then(result => {
+      if (result) {
         response.status(204).end();
-    } else {
-        response.status(404).send({ error: 'name not found' });
-    }
+      } else {
+        response.status(404).send({ error: 'person not found' });
+      }
+    })
+    .catch(error => next(error));
 });
 
 app.get('/info', (req, res) => {
-    const currentTime = new Date();
-    const numberOfPeople = persons.length;
+  const currentTime = new Date();
 
-    const responseHtml = `
-        <p>Phonebook has info of ${numberOfPeople} people</p>
-        <p>${currentTime}</p>
-    `;
-
-    res.send(responseHtml);
+  Person.countDocuments({})
+    .then(numberOfPeople => {
+      const responseHtml = `
+                <p>Phonebook has info of ${numberOfPeople} people</p>
+                <p>${currentTime}</p>
+            `;
+      res.send(responseHtml);
+    }).catch(error => {
+      console.error(error);
+      res.status(500).send('Error fetching data.');
+    });
 });
 
-app.post('/api/persons', (request, response) => {
-    const body = request.body
+app.post('/api/persons', (request, response, next) => {
+  const body = request.body;
 
-    if (!body.name || !body.number) {
-        return response.status(400).json({
-            error: 'name or number is missing'
-        })
-    }
+  const person = new Person({
+    name: body.name,
+    number: body.number
+  });
 
-    // Check for duplicate name
-    const duplicate = persons.find(p => p.name === body.name)
-    if (duplicate) {
-        return response.status(400).json({
-            error: 'name must be unique'
-        })
-    }
+  person.save()
+    .then(savedPerson => response.status(201).json(savedPerson))
+    .catch(error => {
+      if (error.name === 'ValidationError') {
+        response.status(400).send({ error: error.message });
+      } else {
+        next(error);
+      }
+    });
+});
 
-    const person = {
-        id: Math.floor(Math.random() * 1000000), // generate a random id
-        name: body.name,
-        number: body.number
-    }
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body;
 
-    persons = persons.concat(person)
+  const person = {
+    name: body.name,
+    number: body.number
+  };
 
-    response.json(person)
-})
+  Person.findByIdAndUpdate(request.params.id, person, { new: true, runValidators: true, context: 'query' })
+    .then(updatedPerson => {
+      if (updatedPerson) {
+        response.json(updatedPerson);
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch(error => next(error));
+});
 
+app.use((error, request, response, next) => {
+  console.error(error.message);
 
-const PORT = 3000
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' });
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message });
+  }
+
+  response.status(500).end();  // Handle all other errors with a generic 500 status code.
+});
+process.on('SIGINT', function () {
+  mongoose.connection.close(function () {
+    console.log('Mongoose default connection disconnected through app termination');
+    process.exit(0);
+  });
+});
+
+const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-})
+  console.log(`Server running on port ${PORT}`);
+});

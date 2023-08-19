@@ -110,8 +110,8 @@ const App = () => {
                     setNotificationMessage({message: `Added ${person.name}`, type: 'success'});
                 })
                 .catch(error => {
-                    console.log(error)
-                    setNotificationMessage({message: 'Error creating new contact', type: 'error'})
+                    const errorMessage = error.response?.data?.error || 'Error creating new contact';
+                    setNotificationMessage({message: errorMessage, type: 'error'});
                 });
         } else {
             if (window.confirm(`${personObject.name} is already added to phonebook do you want to update the PhoneNumber?`)) {
@@ -122,10 +122,10 @@ const App = () => {
                         )
                     ))
                     .catch(error => {
-                        console.log(error);
-                        setNotificationMessage({message: `Error updating ${personObject.name}`, type: 'error'});
+                        const errorMessage = error.response?.data?.error || 'Error creating new contact';
+                        setNotificationMessage({message: errorMessage, type: 'error'});
                         personService.getAll().then(response => setPersons(response));
-                    })
+                    });
             }
         }
         setNewName('');

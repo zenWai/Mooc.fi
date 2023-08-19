@@ -13,3 +13,4 @@ build
 /workspace.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+/part3/phonebook-backend/.env
