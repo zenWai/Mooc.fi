@@ -12,3 +12,24 @@ Content-Type: application/json
   "url": "http://example.com/samplee-blog",
   "likes": 1
 }
+
+###
+POST http://localhost:3006/api/users
+Content-Type: application/json
+
+{
+  "username": "sampleUser",
+  "name": "John Doe",
+  "password": "samplePassword"
+}
+
+### Login Request
+POST http://localhost:3006/api/login
+Content-Type: application/json
+
+{
+  "username": "sampleUser",
+  "password": "samplePassword"
+}
+
+###
