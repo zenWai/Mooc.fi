@@ -1,0 +1,14 @@
+### Get blog posts
+GET http://localhost:3006/api/blogs
+Accept: application/json
+
+### POST a new blog
+POST http://localhost:3006/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Sample Blog Post2",
+  "author": "John Doee",
+  "url": "http://example.com/samplee-blog",
+  "likes": 1
+}

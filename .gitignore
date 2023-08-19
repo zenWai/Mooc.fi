@@ -14,3 +14,4 @@ build
 # Editor-based HTTP Client requests
 /httpRequests/
 /part3/phonebook-backend/.env
+/part4/blogposts/.env
