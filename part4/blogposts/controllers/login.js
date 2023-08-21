@@ -22,11 +22,23 @@ loginRouter.post('/', async (request, response) => {
     id: user._id,
   };
 
-  const token = jwt.sign(userForToken, process.env.SECRET);
+  const TOKEN_EXPIRATION_TIME = '1h';
+  const token = jwt.sign(
+    userForToken,
+    process.env.SECRET,
+    { expiresIn: TOKEN_EXPIRATION_TIME }
+  );
 
+  const expirationTimestamp = Date.now() + 60 * 60 * 1000;  // Current time + 1 hour in milliseconds
   response
     .status(200)
-    .send({ token, username: user.username, name: user.name });
+    .send({
+      token,
+      expiration: expirationTimestamp,
+      username: user.username,
+      name: user.name,
+      id: user._id.toString()
+    });
 });
 
 module.exports = loginRouter;

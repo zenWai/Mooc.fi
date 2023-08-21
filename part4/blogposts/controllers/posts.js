@@ -6,7 +6,26 @@ const jwt = require('jsonwebtoken');
 postsRouter.get('/', async (request, response) => {
   try {
     const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 });
-    response.json(blogs);
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(request.token, process.env.SECRET);
+    } catch (error) {
+      return response.status(401).send({ error: 'Token invalid or expired' });
+    }
+
+    const user = await User.findById(decodedToken.id);
+    if (!user) {
+      return response.status(401).send({ error: 'User not found or token invalid' });
+    }
+
+    // Check if the user has already liked the blog
+
+    const transformedBlogs = blogs.map(blog => ({
+      ...blog.toJSON(),
+      hasLiked: blog.likedBy.includes(user._id)
+    }));
+
+    response.json(transformedBlogs);
   } catch (error) {
     response.status(500).send({ error: 'Something went wrong.' });
   }
@@ -52,22 +71,27 @@ postsRouter.post('/', async (request, response) => {
 });
 
 postsRouter.delete('/:id', async (request, response) => {
-  const blog = await Blog.findById(request.params.id);
+  try {
 
-  if (!blog) {
-    return response.status(404).json({ error: 'Blog not found' });
+    const blog = await Blog.findById(request.params.id);
+
+    if (!blog) {
+      return response.status(404).json({ error: 'Blog not found' });
+    }
+
+    if (!request.user) {
+      return response.status(401).json({ error: 'User not authenticated' });
+    }
+
+    if (!blog.user || blog.user.toString() !== request.user._id.toString()) {
+      return response.status(401).json({ error: 'Only the creator can delete this blog' });
+    }
+
+    await Blog.findByIdAndRemove(request.params.id);
+    response.status(204).end();
+  } catch (error) {
+    response.status(400).send({ error: 'Something went wrong.' });
   }
-
-  if (!request.user) {
-    return response.status(401).json({ error: 'User not authenticated' });
-  }
-
-  if (!blog.user || blog.user.toString() !== request.user._id.toString()) {
-    return response.status(401).json({ error: 'Only the creator can delete this blog' });
-  }
-
-  await Blog.findByIdAndRemove(request.params.id);
-  response.status(204).end();
 });
 
 postsRouter.put('/:id', async (request, response) => {
@@ -83,6 +107,52 @@ postsRouter.put('/:id', async (request, response) => {
 
     const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true });
     response.json(updatedBlog);
+  } catch (error) {
+    response.status(400).send({ error: 'Something went wrong.' });
+  }
+});
+
+postsRouter.put('/:id/like', async (request, response) => {
+  try {
+    // First, fetch the existing blog from the database
+    const existingBlog = await Blog.findById(request.params.id);
+
+    if (!existingBlog) {
+      return response.status(404).send({ error: 'Blog not found.' });
+    }
+
+    if (!request.token) {
+      return response.status(401).send({ error: 'Token missing' });
+    }
+
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(request.token, process.env.SECRET);
+    } catch (error) {
+      return response.status(401).send({ error: 'Token invalid or expired' });
+    }
+
+    const user = await User.findById(decodedToken.id);
+    if (!user) {
+      return response.status(401).send({ error: 'User not found or token invalid' });
+    }
+
+    // Check if the user has already liked the blog
+    const hasLiked = existingBlog.likedBy.includes(user._id);
+
+    // If they have liked it already, unlike it. Otherwise, like it.
+    if (hasLiked) {
+      existingBlog.likes -= 1;
+      existingBlog.likedBy = existingBlog.likedBy.filter(userId => userId.toString() !== user._id.toString());
+    } else {
+      existingBlog.likes += 1;
+      existingBlog.likedBy.push(user._id);
+    }
+
+    // Save the modified blog
+    await existingBlog.save();
+
+    response.json(existingBlog);
   } catch (error) {
     response.status(400).send({ error: 'Something went wrong.' });
   }
