@@ -1,9 +1,9 @@
 ### Get blog posts
-GET http://localhost:3006/api/blogs
+GET http://localhost:3003/api/blogs
 Accept: application/json
 
 ### POST a new blog
-POST http://localhost:3006/api/blogs
+POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
@@ -14,17 +14,17 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3006/api/users
+POST http://localhost:3003/api/users
 Content-Type: application/json
 
 {
-  "username": "sampleUser",
+  "username": "pass",
   "name": "John Doe",
-  "password": "samplePassword"
+  "password": "pass"
 }
 
 ### Login Request
-POST http://localhost:3006/api/login
+POST http://localhost:3003/api/login
 Content-Type: application/json
 
 {

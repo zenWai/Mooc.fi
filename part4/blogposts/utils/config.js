@@ -11,7 +11,7 @@ default:
   MONGODB_URI = process.env.MONGODBLOG_URI_DEV;
 }
 
-const PORT = 3006;
+const PORT = 3003;
 
 module.exports = {
   MONGODB_URI,
