@@ -188,6 +188,62 @@ describe('Blog API', () => {
     expect(blogsAtEnd).toHaveLength(initialLength);
   });
 
+  test('a blog can only be deleted by its creator', async () => {
+    const firstUser = {
+      username: 'firstUser',
+      password: 'password1',
+      name: 'User One'
+    };
+
+    const secondUser = {
+      username: 'secondUser',
+      password: 'password2',
+      name: 'User Two'
+    };
+
+    // Register the first user and login
+    await api.post('/api/users').send(firstUser);
+    const firstUserLogin = await api.post('/api/login').send({
+      username: firstUser.username,
+      password: firstUser.password
+    });
+    const firstUserToken = firstUserLogin.body.token;
+    // Register the second user and login
+    await api.post('/api/users').send(secondUser);
+    const secondUserLogin = await api.post('/api/login').send({
+      username: secondUser.username,
+      password: secondUser.password
+    });
+    const secondUserToken = secondUserLogin.body.token;
+    // First user creates a blog
+    const blogData = {
+      title: 'Test Blog',
+      author: 'Test Author',
+      url: 'http://testblog.com',
+      likes: 1
+    };
+    console.log('stuff1')
+    const addedBlogResponse = await api.post('/api/blogs')
+      .set('Authorization', `Bearer ${firstUserToken}`)
+      .send(blogData)
+      .expect(201);
+    const addedBlog = addedBlogResponse.body;
+
+    // Get initial count of blogs
+    const initialBlogCount = (await helper.blogsInDb()).length;
+
+    console.log('before deletion');
+    // Second user tries to delete the blog created by the first user
+    await api.delete(`/api/blogs/${addedBlog.id}`)
+      .set('Authorization', `Bearer ${secondUserToken}`)
+      .expect(401);
+    console.log('ended deletion');
+    // Confirm the number of blogs remains unchanged
+    const blogsAtEnd = await helper.blogsInDb();
+    console.log('after helper');
+    expect(blogsAtEnd).toHaveLength(initialBlogCount);
+  });
+
   test('a blog can be updated', async () => {
     const blogsAtStart = await helper.blogsInDb();
     const blogToUpdate = blogsAtStart[0];
@@ -207,6 +263,55 @@ describe('Blog API', () => {
     const updatedBlog = blogsAtEnd.find(b => b.id === blogToUpdate.id);
 
     expect(updatedBlog.likes).toBe(blogToUpdate.likes + 1);
+  });
+
+  describe('PUT /api/blogs/:id/like', () => {
+
+    test('liking a blog increases its likes by 1', async () => {
+      const blogsAtStart = await helper.blogsInDb();
+      const blogToLike = blogsAtStart[0];
+
+      await api
+        .put(`/api/blogs/${blogToLike.id}/like`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+
+      const blogsAtEnd = await helper.blogsInDb();
+      const likedBlog = blogsAtEnd.find(b => b.id === blogToLike.id);
+
+      expect(likedBlog.likes).toBe(blogToLike.likes + 1);
+    });
+
+    test('unliking a blog decreases its likes by 1', async () => {
+      const blogsAtStart = await helper.blogsInDb();
+      const blogToLike = blogsAtStart[0];
+
+      // First, like the blog
+      await api
+        .put(`/api/blogs/${blogToLike.id}/like`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+
+      // Then, unlike the blog
+      await api
+        .put(`/api/blogs/${blogToLike.id}/like`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+
+      const blogsAtEnd = await helper.blogsInDb();
+      const unlikedBlog = blogsAtEnd.find(b => b.id === blogToLike.id);
+
+      expect(unlikedBlog.likes).toBe(blogToLike.likes);
+    });
+
+    test('liking a blog without a token returns 401', async () => {
+      const blogsAtStart = await helper.blogsInDb();
+      const blogToLike = blogsAtStart[0];
+
+      await api
+        .put(`/api/blogs/${blogToLike.id}/like`)
+        .expect(401);
+    });
   });
 
   afterAll(() => {

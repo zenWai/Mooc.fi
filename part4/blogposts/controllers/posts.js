@@ -6,20 +6,8 @@ const jwt = require('jsonwebtoken');
 postsRouter.get('/', async (request, response) => {
   try {
     const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 });
-    let decodedToken;
-    try {
-      decodedToken = jwt.verify(request.token, process.env.SECRET);
-    } catch (error) {
-      return response.status(401).send({ error: 'Token invalid or expired' });
-    }
-
-    const user = await User.findById(decodedToken.id);
-    if (!user) {
-      return response.status(401).send({ error: 'User not found or token invalid' });
-    }
-
-    // Check if the user has already liked the blog
-
+    // Since userExtractor has already populated request.user, just use it
+    const user = request.user;
     const transformedBlogs = blogs.map(blog => ({
       ...blog.toJSON(),
       hasLiked: blog.likedBy.includes(user._id)
@@ -41,15 +29,7 @@ postsRouter.post('/', async (request, response) => {
     return response.status(401).send({ error: 'Token missing' });
   }
 
-  let decodedToken;
-  try {
-    decodedToken = jwt.verify(request.token, process.env.SECRET);
-  } catch (error) {
-    return response.status(401).send({ error: 'Token invalid or expired' });
-  }
-
-  // Fetch the user using the ID from the decoded token
-  const user = await User.findById(decodedToken.id);
+  let user = request.user;
   if (!user) {
     return response.status(401).send({ error: 'User not found or token invalid' });
   }
@@ -125,14 +105,7 @@ postsRouter.put('/:id/like', async (request, response) => {
       return response.status(401).send({ error: 'Token missing' });
     }
 
-    let decodedToken;
-    try {
-      decodedToken = jwt.verify(request.token, process.env.SECRET);
-    } catch (error) {
-      return response.status(401).send({ error: 'Token invalid or expired' });
-    }
-
-    const user = await User.findById(decodedToken.id);
+    const user = request.user;
     if (!user) {
       return response.status(401).send({ error: 'User not found or token invalid' });
     }
