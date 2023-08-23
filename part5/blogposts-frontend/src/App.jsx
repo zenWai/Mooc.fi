@@ -23,13 +23,12 @@ const App = () => {
     const checkTokenExpiration = () => {
       if (isTokenExpired()) {
         handleLogout();
-        window.alert('Session expired. Please log in again.')
       }
     }
     // Check the token's status every 5 minutes
     const intervalId = setInterval(checkTokenExpiration, 5 * 60 * 1000);
 
-    return () => clearInterval(intervalId); // Cleanup on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   const initializeUser = async () => {
@@ -89,6 +88,7 @@ const App = () => {
         <div>
           username
           <input
+            id="username"
             type="text"
             value={username}
             name="Username"
@@ -98,13 +98,14 @@ const App = () => {
         <div>
           password
           <input
+            id="password"
             type="password"
             value={password}
             name="Password"
             onChange={({ target }) => setPassword(target.value)}
           />
         </div>
-        <button type="submit">login</button>
+        <button id="login-button" type="submit">login</button>
       </form>
     </div>
   );
@@ -113,7 +114,7 @@ const App = () => {
     <div>
       <h2>Blogs</h2>
       <Notification ref={notificationRef} message="Loaded" type="success"/>
-      <p>{user.name} logged in - <button onClick={handleLogout}>logout</button></p>
+      <p>{user.name} logged in - <button id="logout-button" onClick={handleLogout}>logout</button></p>
       <CreatePostForm
         title={title}
         setTitle={setTitle}

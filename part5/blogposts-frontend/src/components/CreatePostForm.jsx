@@ -17,7 +17,7 @@ const CreatePostForm = ({
 
   const handleCreateNew = async (event) => {
     const loggedInUserJSON = window.localStorage.getItem('loggedInUser');
-    const { id: userId } = JSON.parse(loggedInUserJSON) || {};
+    const { id: userId, name: userName} = JSON.parse(loggedInUserJSON) || {};
     event.preventDefault();
 
     const newBlog = {
@@ -26,13 +26,14 @@ const CreatePostForm = ({
       url
     };
 
+    console.log(newBlog)
     try {
       const createdBlog = await blogService.create(newBlog);
       const createdBlogWithAuthorId = {
         ...createdBlog,
         user: {
-          id: userId,  // or `decodedToken.id` if you're passing the token
-          // add any other properties of the user you might need, if any
+          id: userId,
+          name: userName
         }
       };
       setBlogs([...blogs, createdBlogWithAuthorId]);
@@ -48,13 +49,14 @@ const CreatePostForm = ({
   };
 
   return (
-    <Togglable showLabel='Create Post' hideLabel='Cancel' ref={createNewFormRef}>
+    <Togglable showLabel='Create New' hideLabel='Cancel' ref={createNewFormRef}>
       <div>
-        <h3>Create New:</h3>
+        <h3 id="create-form-title">Create New:</h3>
         <form onSubmit={handleCreateNew}>
           <div>
             title:
             <input
+              id="create-form-input-title"
               value={title}
               onChange={({ target }) => setTitle(target.value)}
             />
@@ -62,6 +64,7 @@ const CreatePostForm = ({
           <div>
             author:
             <input
+              id="create-form-input-author"
               value={author}
               onChange={({ target }) => setAuthor(target.value)}
             />
@@ -69,11 +72,12 @@ const CreatePostForm = ({
           <div>
             url:
             <input
+              id="create-form-input-url"
               value={url}
               onChange={({ target }) => setUrl(target.value)}
             />
           </div>
-          <button type="submit">Create</button>
+          <button id="create-form-create-post-button" type="submit">Create Post</button>
         </form>
       </div>
     </Togglable>

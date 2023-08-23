@@ -1,7 +1,6 @@
 import Togglable from "./Togglable.jsx";
-import {useRef, useState} from "react";
+import {useState} from "react";
 import blogService from '../services/blogs'
-import Notification from "../components/NotificationMessage.jsx";
 
 const Blog = ({ blog, setBlogs, blogs, notificationRef}) => {
   const [isHeaderVisible, setHeaderVisibility] = useState(true);
@@ -64,7 +63,7 @@ const Blog = ({ blog, setBlogs, blogs, notificationRef}) => {
     } catch (error) {
       console.error('Error liking the blog', error);
     } finally {
-      setIsLiking(false);  // reset loading indication
+      setIsLiking(false);
     }
   }
 
@@ -83,21 +82,21 @@ const Blog = ({ blog, setBlogs, blogs, notificationRef}) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div className="blog-parent-div" style={blogStyle}>
       <div style={isHeaderVisible ? headerStyle : {}}>
-        <h3>{blog.title}</h3>
+        <h3 id="blog-titleauthor" className="blog-title-author">{blog.title} By {blog.author}</h3>
         {blog.user && loggedInUserId === blog.user.id && (
-          <button onClick={() => handleDelete(blog.id)}>Delete</button>
+          <button id="blog-delete-button" onClick={() => handleDelete(blog.id)}>Delete</button>
         )}
         <Togglable showLabel='View' hideLabel='Hide' onToggle={handleToggle}>
           <ul style={listStyle}>
-            <li>Url: {blog.url}</li>
-            <li>Likes: {likes}
-              <button onClick={() => handleLike(blog.id)} disabled={isLiking}>
+            <li id="blog-url" className="blog-url">Url: {blog.url}</li>
+            <li id="blog-likes" className="blog-likes">Likes: {likes}
+              <button id="blog-like-button" onClick={() => handleLike(blog.id)} disabled={isLiking}>
                 {isLiking ? 'Loading...' : (hasLiked ? 'Liked' : 'Like')}
               </button>
             </li>
-            <li>Author: {blog.author}</li>
+            <li id="blog-created-by">Created by: {blog.user ? blog.user.name : 'Unknown'}</li>
           </ul>
         </Togglable>
       </div>
