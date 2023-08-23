@@ -26,6 +26,10 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 app.use('/api/users', usersRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/blogs', middleware.userExtractor, postsRouter);
+if (process.env.NODE_ENV === 'test') {
+  const testingRouter = require('./controllers/testing');
+  app.use('/api/testing', testingRouter);
+}
 
 // Handling unknown endpoints
 app.use(middleware.unknownEndpoint);
