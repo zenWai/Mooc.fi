@@ -1,13 +1,14 @@
 import {useDispatch} from "react-redux";
-import {addAnecdoteAction} from "../reducers/anecdoteReducer";
 import {setNotification} from "../reducers/notificationReducer";
+import {createAnecdote} from "../server/requests";
 
 const AnecdoteForm = () => {
   const dispatch = useDispatch();
   // combine into a single
   const addWithNotification = (content) => dispatch => {
-    dispatch(addAnecdoteAction(content));
-    dispatch(setNotification(`New Anecdote added: '${content}'`));
+    console.log('content',content)
+    dispatch(createAnecdote(content));
+    dispatch(setNotification({ message: `New Anecdote added: '${content}'`, duration: 10 }));
   }
   const addAnecdote = (event) => {
     event.preventDefault();

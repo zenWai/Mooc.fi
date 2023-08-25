@@ -3,17 +3,17 @@ import {useEffect} from "react";
 import {clearNotification} from "../reducers/notificationReducer";
 
 const Notification = () => {
-  const { message, visible } = useSelector(state => state.notification);
+  const { message, visible, duration } = useSelector(state => state.notification);
   const dispatch = useDispatch();
   useEffect(() => {
     if (visible) {
       const timerId = setTimeout(() => {
         dispatch(clearNotification());
-      }, 5000);
+      }, duration);
 
       return () => clearTimeout(timerId);
     }
-  }, [visible, dispatch]);
+  }, [visible, dispatch, duration]);
 
   const style = {
     border: 'solid',
@@ -24,7 +24,8 @@ const Notification = () => {
   }
   return (
     <div style={style}>
-      {message}
+      {/* object {message: ''} mandatory */}
+      {message ? message.message : null}
     </div>
   )
 }

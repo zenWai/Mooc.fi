@@ -13,7 +13,7 @@ const Filter = () => {
 
   return (
     <div style={style}>
-      filter <input onChange={handleChange}/>
+      filter <input onChange={handleChange} placeholder="Type to filter..."/>
     </div>
   )
 }
