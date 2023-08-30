@@ -6,10 +6,10 @@ import authHelper from "./helpers/authHelpers.js";
 import {Route, Routes} from "react-router-dom";
 import Navbar from "./components/NavBar.jsx";
 import UsersView from "./components/Views/UsersView.jsx";
-import BlogsView from "./components/Views/BlogsView.jsx";
 import LoginFormView from "./components/Views/LoginFormView.jsx";
 import UserDetailsView from "./components/Views/UserDetailsView.jsx";
 import BlogDetailsView from "./components/Views/BlogDetailsView.jsx";
+import CheckboxListSecondary from "./components/BlogList.jsx";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -44,19 +44,19 @@ const App = () => {
   );
 
   const renderBlogsApp = () => (
-    <>
+    <div>
       <Navbar/>
       <Routes>
         <Route path="/users/:userID" element={<UserDetailsView/>}/>
         <Route path="/blogs/:blogID" element={<BlogDetailsView/>}/>
         <Route path="/users" element={<UsersView/>}/>
-        <Route path="/" element={<BlogsView/>}/>
+        <Route path="/" element={<CheckboxListSecondary/>}/>
       </Routes>
-    </>
+    </div>
   );
 
   if (isLoading) {
-    return <div className="spinner"></div>;
+    return ;
   }
 
   return user === null ? renderLoginForm() : renderBlogsApp();
