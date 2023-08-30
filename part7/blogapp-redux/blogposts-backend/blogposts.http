@@ -1,0 +1,42 @@
+### Get blog posts
+GET http://localhost:3003/api/blogs
+Accept: application/json
+
+### POST a new blog
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Sample Blog Post2",
+  "author": "John Doee",
+  "url": "http://example.com/samplee-blog",
+  "likes": 1
+}
+
+### user1
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "pass",
+  "name": "John Doe",
+  "password": "pass"
+}
+### user2
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+"username": "user2",
+"name": "myNameIs 2",
+"password": "pass"
+}
+
+### Login Request
+POST http://localhost:3003/api/login
+Content-Type: application/json
+
+{
+  "username": "sampleUser",
+  "password": "samplePassword"
+}
