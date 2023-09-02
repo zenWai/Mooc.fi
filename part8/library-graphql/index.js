@@ -1,5 +1,6 @@
 require('dotenv').config()
-const { ApolloServer, GraphQLError, AuthenticationError } = require('@apollo/server');
+const { ApolloServer, AuthenticationError } = require('@apollo/server');
+const { GraphQLError } = require('graphql')
 const { startStandaloneServer } = require('@apollo/server/standalone')
 const { v1: uuid } = require('uuid')
 const Author = require('./src/models/Author')
@@ -78,7 +79,7 @@ const resolvers = {
       return context.currentUser;
     },
     User: async (root, args) => {
-      return await User.findById(args.id);
+      return User.findById(args.id);
     },
     bookCount: async () => {
       try {
@@ -157,17 +158,19 @@ const resolvers = {
       if (!context.currentUser) {
         throw new AuthenticationError('Authentication required');
       }
+      console.log('args', args);
 
       try {
-        const author = await Author.findOne({ name: args.author });
+        let author = await Author.findOne({ name: args.author });
         if (!author) {
           const newAuthor = new Author({
             name: args.author,
             born: null,
           });
           await newAuthor.save();
+          author = newAuthor;
         }
-        const book = new Book({ ...args, author: author?._id });
+        const book = new Book({ ...args, author: author });
         await book.save();
         return book;
       } catch (error) {
@@ -207,18 +210,24 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: async ({ req }) => {
-    const auth = req ? req.headers.authorization : null;
-    if (auth && auth.toLowerCase().startsWith('bearer ')) {
-      const decodedToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET);
-      const currentUser = await User.findById(decodedToken.id);
-      return { currentUser };
-    }
-  },
 })
 
 startStandaloneServer(server, {
   listen: { port: 4000 },
+  context: async ({ req, res }) => {
+    const auth = req ? req.headers.authorization : null;
+    console.log('auth', auth)
+    try {
+      const decodedToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET);
+      const currentUser = await User.findById(decodedToken.id);
+      console.log('decodedToken', decodedToken);
+      console.log('currentUser', currentUser);
+      return { currentUser };
+    } catch (error) {
+      console.log('Error in context function', error);
+      throw new AuthenticationError('Invalid token');
+    }
+  },
 }).then(({ url }) => {
   console.log(`Server ready at ${url}`)
 })
