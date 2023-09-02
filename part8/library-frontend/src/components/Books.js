@@ -24,7 +24,6 @@ const Books = () => {
   if (errorMessage) {
     return <div>Error: {errorMessage}</div>;
   }
-
   const books = result.data.allBooks;
   const genres = genreResult.data.allGenres;
   console.log(books);
