@@ -25,6 +25,7 @@ mongoose.connect(MONGODB_URI)
 const typeDefs = `
   type User {
     username: String!
+    favoriteGenre: String!
     id: ID!
   }
   type Token {
@@ -56,6 +57,7 @@ const typeDefs = `
     ): Author
     createUser(
       username: String!
+      favoriteGenre: String!
     ): User
     login(
       username: String!
@@ -70,6 +72,7 @@ const typeDefs = `
     authorCount: Int!
     allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]!
+    allGenres: [String!]!
   }
 `
 
@@ -105,6 +108,12 @@ const resolvers = {
         throw new Error("Failed to get books:", error);
       }
     },
+    allGenres: async () => {
+      const books = await Book.find({});
+      const allGenres = new Set();
+      books.forEach(book => book.genres.forEach(genre => allGenres.add(genre)));
+      return Array.from(allGenres);
+    },
     allAuthors: async () => {
       try {
         return await Author.find({});
@@ -120,7 +129,10 @@ const resolvers = {
   },
   Mutation: {
     createUser: async (root, args) => {
-      const user = new User({ username: args.username });
+      const user = new User({
+        username: args.username,
+        favoriteGenre: args.favoriteGenre
+      });
 
       try {
         await user.save();
@@ -217,15 +229,17 @@ startStandaloneServer(server, {
   context: async ({ req, res }) => {
     const auth = req ? req.headers.authorization : null;
     console.log('auth', auth)
-    try {
-      const decodedToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET);
-      const currentUser = await User.findById(decodedToken.id);
-      console.log('decodedToken', decodedToken);
-      console.log('currentUser', currentUser);
-      return { currentUser };
-    } catch (error) {
-      console.log('Error in context function', error);
-      throw new AuthenticationError('Invalid token');
+    if (auth && auth.startsWith('Bearer ')) {
+      try {
+        const decodedToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET);
+        const currentUser = await User.findById(decodedToken.id);
+        console.log('decodedToken', decodedToken);
+        console.log('currentUser', currentUser);
+        return { currentUser };
+      } catch (error) {
+        console.log('Error in context function', error);
+        throw new AuthenticationError('Invalid token');
+      }
     }
   },
 }).then(({ url }) => {

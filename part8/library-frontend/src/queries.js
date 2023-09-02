@@ -11,18 +11,22 @@ export const ALL_AUTHORS = gql`
 `
 
 export const ALL_BOOKS = gql`
-  query {
-    allBooks {
-      title
-      published
-        author {
-            name
-            born
-            id
+    query allBooks($genre: String) {
+        allBooks(genre: $genre) {
+            title
+            author {
+                name
+            }
+            published
         }
     }
-  }
 `
+
+export const ALL_GENRES = gql`
+    query {
+        allGenres
+    }
+`;
 
 export const CREATE_BOOK = gql`
   mutation createBook($title: String!, $author: String!, $published: Int!, $genres: [String!]!) {
@@ -63,3 +67,12 @@ export const LOGIN = gql`
         }
     }
 `
+
+export const ME = gql`
+    query {
+        me {
+            username
+            favoriteGenre
+        }
+    }
+`;

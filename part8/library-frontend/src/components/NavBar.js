@@ -1,6 +1,7 @@
 import {Link} from "react-router-dom";
 
 const navBar = () => {
+
   return (
     <div>
       <nav style={{ padding: 24 }}>
