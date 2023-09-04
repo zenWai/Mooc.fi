@@ -1,0 +1,25 @@
+### Test POST /exercises with valid data
+POST http://localhost:3003/exercises
+Content-Type: application/json
+
+{
+  "daily_exercises": [1, 0, 2, 0, 3, 0, 2.5],
+  "target": 2.5
+}
+
+### Test POST /exercises with missing parameters
+POST http://localhost:3003/exercises
+Content-Type: application/json
+
+{
+  "daily_exercises": [1, 0, 2, 0, 3, 0, 2.5]
+}
+
+### Test POST /exercises with malformatted parameters
+POST http://localhost:3003/exercises
+Content-Type: application/json
+
+{
+  "daily_exercises": [1, 0, "wrong", 0, 3, 0, 2.5],
+  "target": 2.5
+}

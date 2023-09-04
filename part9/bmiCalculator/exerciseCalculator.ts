@@ -11,7 +11,7 @@
 // The daily exercise hours are given to the function as an array
 // that contains the number of exercise hours for each day in the training period.
 // For the Result object, you should create an interface.
-interface ExerciseResult {
+export interface ExerciseResult {
     periodLength: number;
     trainingDays: number;
     success: boolean;
@@ -53,7 +53,8 @@ const calculateExercises = (dailyHours: number[], targetAmount: number): Exercis
     };
     return result;
 };
-
+export default calculateExercises;
+/*
 const argsExerciseCalculator = process.argv.slice(2);
 
 if (argsExerciseCalculator.length < 2) {
@@ -68,4 +69,4 @@ if (isNaN(target) || dailyHours.some(hour => isNaN(hour))) {
     process.exit(1);
 }
 
-console.log(calculateExercises(dailyHours, target));
+console.log(calculateExercises(dailyHours, target));*/
