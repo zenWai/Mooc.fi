@@ -1,7 +1,7 @@
 import {Gender, NewPatient,} from "../types/patientTypes";
 
 export const toNewPatient = (object: unknown): NewPatient => {
-  if (!isObject(object) || !object.name || !object.dateOfBirth || !object.ssn || !object.gender || !object.occupation) {
+  if (!isObject(object) || !object.name || !object.dateOfBirth || !object.ssn || !object.gender || !object.occupation || !Array.isArray(object.entries)) {
     throw new Error('Bad or missing data');
   }
 
@@ -11,6 +11,7 @@ export const toNewPatient = (object: unknown): NewPatient => {
     ssn: parseString(object.ssn),
     gender: parseGender(object.gender),
     occupation: parseString(object.occupation),
+    entries: [],
   };
 };
 
