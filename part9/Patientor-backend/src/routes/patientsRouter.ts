@@ -17,7 +17,7 @@ router.get('/', (_req, res) => {
 
   res.json(publicPatients);
 });
-router.get('/api/patients/:id', (req, res) => {
+router.get('/:id', (req, res) => {
   const id = req.params.id;
   const patient = patients.find((p) => p.id === id);
 

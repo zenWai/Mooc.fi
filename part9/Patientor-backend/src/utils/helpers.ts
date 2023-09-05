@@ -1,4 +1,5 @@
 import {Gender, NewPatient,} from "../types/patientTypes";
+import {Diagnose} from "../types/diagnoseTypes";
 
 export const toNewPatient = (object: unknown): NewPatient => {
   if (!isObject(object) || !object.name || !object.dateOfBirth || !object.ssn || !object.gender || !object.occupation || !Array.isArray(object.entries)) {
@@ -35,4 +36,12 @@ const parseGender = (gender: unknown): Gender => {
     throw new Error('Incorrect or missing gender: ' + gender);
   }
   return gender as Gender;
+};
+
+export const parseDiagnosisCodes = (object: unknown): Array<Diagnose['code']> => {
+  if (!object || typeof object !== 'object' || !('diagnosisCodes' in object)) {
+    // we will trust the data to be in correct form
+    return [] as Array<Diagnose['code']>;
+  }
+  return object.diagnosisCodes as Array<Diagnose['code']>;
 };
