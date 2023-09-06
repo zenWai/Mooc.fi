@@ -1,6 +1,6 @@
 import React from 'react';
 import {FlatList, View, StyleSheet} from 'react-native';
-import RepositoryItem from './RepositoryItem';  // Import the RepositoryItem component
+import RepositoryItem from './RepositoryItem';
 
 const repositories = [
   {
@@ -57,12 +57,15 @@ const RepositoryList = () => {
   };
 
   return (
-    <FlatList
-      data={repositories}
-      ItemSeparatorComponent={ItemSeparator}
-      renderItem={renderItem}
-      keyExtractor={item => item.id}
-    />
+    <>
+      <ItemSeparator/>
+      <FlatList
+        data={repositories}
+        ItemSeparatorComponent={ItemSeparator}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+      />
+    </>
   );
 };
 
