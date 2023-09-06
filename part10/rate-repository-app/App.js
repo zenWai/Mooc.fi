@@ -1,11 +1,16 @@
 import Main from './src/components/Main';
-import {SafeAreaView} from "react-native";
+import {NativeRouter} from 'react-router-native';
+import {SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
 
 const App = () => {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Main/>
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView style={{ flex: 1 }}>
+        <NativeRouter>
+          <Main/>
+        </NativeRouter>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 

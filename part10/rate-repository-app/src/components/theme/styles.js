@@ -28,6 +28,7 @@ export const styles = StyleSheet.create({
   },
   colorError: {
     color: theme.colors.error,
+    fontSize: theme.fontSizes.body
   },
   fontSizeSubheading: {
     fontSize: theme.fontSizes.subheading,
