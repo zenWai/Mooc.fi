@@ -1,10 +1,11 @@
 import React from 'react';
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
-import { Formik } from 'formik';
+import {Formik} from 'formik';
 import * as yup from 'yup';
 import Text from './theme/Text'
 
 import FormikTextInput from './FormikTextInput';
+import {useSignIn} from "../hooks/useSignIn";
 
 const validationSchema = yup.object().shape({
   username: yup
@@ -18,8 +19,8 @@ const validationSchema = yup.object().shape({
 const SignInForm = ({ onSubmit }) => {
   return (
     <View style={styles.container}>
-      <FormikTextInput name="username" placeholder="Username" />
-      <FormikTextInput name="password" placeholder="Password" secureTextEntry={true} />
+      <FormikTextInput name="username" placeholder="Username"/>
+      <FormikTextInput name="password" placeholder="Password" secureTextEntry={true}/>
       <TouchableOpacity style={styles.button} onPress={onSubmit}>
         <Text style={styles.buttonText}>Sign in</Text>
       </TouchableOpacity>
@@ -28,8 +29,18 @@ const SignInForm = ({ onSubmit }) => {
 };
 
 const SignIn = () => {
-  const onSubmit = values => {
-    console.log(values);
+  const [signIn] = useSignIn();
+  const onSubmit = async values => {
+    const { username, password } = values;
+
+    try {
+      const data = await signIn({ username, password });
+      console.log('signIn success: ', data);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      console.log('signIn function execution complete');
+    }
   };
 
   return (
@@ -38,7 +49,7 @@ const SignIn = () => {
       onSubmit={onSubmit}
       validationSchema={validationSchema}
     >
-      {({ handleSubmit }) => <SignInForm onSubmit={handleSubmit} />}
+      {({ handleSubmit }) => <SignInForm onSubmit={handleSubmit}/>}
     </Formik>
   );
 };

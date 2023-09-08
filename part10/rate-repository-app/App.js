@@ -3,8 +3,11 @@ import {NativeRouter} from 'react-router-native';
 import {SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
 import {ApolloProvider} from '@apollo/client';
 import createApolloClient from './src/utils/apolloClient';
+import AuthStorage from './src/utils/AuthStorage';
+import AuthStorageContext from './src/contexts/AuthStorageContext';
 
-const apolloClient = createApolloClient();
+const authStorage = new AuthStorage();
+const apolloClient = createApolloClient(authStorage);
 
 const App = () => {
   return (
@@ -12,7 +15,9 @@ const App = () => {
       <SafeAreaView style={{ flex: 1 }}>
         <NativeRouter>
           <ApolloProvider client={apolloClient}>
-            <Main/>
+            <AuthStorageContext.Provider value={authStorage}>
+              <Main/>
+            </AuthStorageContext.Provider>
           </ApolloProvider>
         </NativeRouter>
       </SafeAreaView>
