@@ -13,13 +13,15 @@ const RepositoryList = () => {
     : [];
 
   const renderItem = ({ item }) => {
-    return <RepositoryItem item={item}/>;
+    return (
+      <RepositoryItem item={item} showGitHubButton={false}/>
+    );
   };
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#0000ff"/>
       </View>
     );
   }
