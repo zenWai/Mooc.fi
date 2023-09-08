@@ -19,9 +19,9 @@ const validationSchema = yup.object().shape({
 const SignInForm = ({ onSubmit }) => {
   return (
     <View style={styles.container}>
-      <FormikTextInput name="username" placeholder="Username"/>
-      <FormikTextInput name="password" placeholder="Password" secureTextEntry={true}/>
-      <TouchableOpacity style={styles.button} onPress={onSubmit}>
+      <FormikTextInput name="username" placeholder="Username" testID="usernameInput"/>
+      <FormikTextInput name="password" placeholder="Password" secureTextEntry={true} testID="passwordInput"/>
+      <TouchableOpacity style={styles.button} onPress={onSubmit} testID="submitButton">
         <Text style={styles.buttonText}>Sign in</Text>
       </TouchableOpacity>
     </View>

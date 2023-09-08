@@ -18,7 +18,7 @@ const RepositoryItem = ({ item }) => {
   const actualItem = { ...defaultItem, ...item };
 
   return (
-    <View style={styles.container}>
+    <View testID="repositoryItem" style={styles.container}>
       <Card
         reviews={actualItem.reviewCount}
         language={actualItem.language}
