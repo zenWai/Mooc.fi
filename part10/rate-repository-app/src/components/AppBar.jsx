@@ -23,14 +23,24 @@ const AppBar = () => {
         </Link>
         {data && data.me ? (
           // User is authenticated
-          <Link to="/signIn" onPress={handleSignOut} underlayColor="#f0f4f7" style={{ margin: 8 }}>
-            <Title style={{ color: 'white' }}>Sign out</Title>
-          </Link>
+          <>
+            <Link to="/createreview" underlayColor="#f0f4f7" style={{ margin: 8 }}>
+              <Title style={{ color: 'white' }}>Create a Review</Title>
+            </Link>
+            <Link to="/signIn" onPress={handleSignOut} underlayColor="#f0f4f7" style={{ margin: 8 }}>
+              <Title style={{ color: 'white' }}>Sign out</Title>
+            </Link>
+          </>
         ) : (
           // User is not authenticated
-          <Link to="/signIn" underlayColor="#f0f4f7" style={{ margin: 8 }}>
-            <Title style={{ color: 'white' }}>Sign in</Title>
-          </Link>
+          <>
+            <Link to="/signIn" underlayColor="#f0f4f7" style={{ margin: 8 }}>
+              <Title style={{ color: 'white' }}>Sign in</Title>
+            </Link>
+            <Link to="/signUp" underlayColor="#f0f4f7" style={{ margin: 8 }}>
+              <Title style={{ color: 'white' }}>Sign UP</Title>
+            </Link>
+          </>
         )}
       </ScrollView>
     </View>

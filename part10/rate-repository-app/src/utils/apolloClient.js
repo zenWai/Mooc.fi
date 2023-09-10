@@ -26,6 +26,17 @@ const createApolloClient = (authStorage) => {
   return new ApolloClient({
     link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
+    defaultOptions: {
+      watchQuery: {
+        errorPolicy: 'all'
+      },
+      query: {
+        errorPolicy: 'all'
+      },
+      mutate: {
+        errorPolicy: 'all'
+      }
+    }
   });
 };
 
