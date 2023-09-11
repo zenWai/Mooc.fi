@@ -29,15 +29,7 @@ const RepositoryList = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const { repositories, loading } = useRepositories(selectedOrder, searchKeyword);
-  const renderHeader = useCallback(() => (
-    <RepositoryListHeader
-      onSelectOrder={setSelectedOrder}
-      modalVisible={modalVisible}
-      setModalVisible={setModalVisible}
-      searchKeyword={searchKeyword}
-      setSearchKeyword={setSearchKeyword}
-    />
-  ), [modalVisible, searchKeyword, setSelectedOrder, setModalVisible, setSearchKeyword]);
+
   const repositoryNodes = repositories
     ? repositories.edges.map(edge => edge.node)
     : [];
@@ -62,7 +54,13 @@ const RepositoryList = () => {
       <FlatList
         data={repositoryNodes}
         ItemSeparatorComponent={ItemSeparator}
-        ListHeaderComponent={renderHeader}
+        ListHeaderComponent={<RepositoryListHeader
+          onSelectOrder={setSelectedOrder}
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          searchKeyword={searchKeyword}
+          setSearchKeyword={setSearchKeyword}
+        />}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
