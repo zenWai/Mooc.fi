@@ -1,12 +1,27 @@
-import React from 'react';
-import {FlatList, View, StyleSheet, ActivityIndicator} from 'react-native';
+import React, {useState} from 'react';
+import {FlatList, View, StyleSheet, ActivityIndicator, TouchableOpacity} from 'react-native';
 import RepositoryItem from './RepositoryItem';
 import useRepositories from '../hooks/useRepositories';
+import OrderPicker from "./OrderPicker";
+import SpecialText from "./theme/SpecialText";
 
 const ItemSeparator = () => <View style={styles.separator}/>;
 
+const RepositoryListHeader = ({ onSelectOrder, modalVisible, setModalVisible }) => {
+  return (
+    <>
+      <TouchableOpacity onPress={() => setModalVisible(true)}>
+        <SpecialText style={{margin: 4}}>Select Order</SpecialText>
+      </TouchableOpacity>
+      {modalVisible && <OrderPicker onSelectOrder={onSelectOrder} onClose={() => setModalVisible(false)} />}
+    </>
+  )
+};
+
 const RepositoryList = () => {
-  const { repositories, loading } = useRepositories();
+  const [selectedOrder, setSelectedOrder] = useState("CREATED_AT_DESC");
+  const [modalVisible, setModalVisible] = useState(false);
+  const { repositories, loading } = useRepositories(selectedOrder);
 
   const repositoryNodes = repositories
     ? repositories.edges.map(edge => edge.node)
@@ -32,6 +47,11 @@ const RepositoryList = () => {
       <FlatList
         data={repositoryNodes}
         ItemSeparatorComponent={ItemSeparator}
+        ListHeaderComponent={<RepositoryListHeader
+          onSelectOrder={setSelectedOrder}
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+        />}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
