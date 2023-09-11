@@ -22,7 +22,7 @@ const RepositoryItemDetails = () => {
   return (
     <FlatList
       data={reviews}
-      renderItem={({ item }) => <ReviewItem review={item}/>}
+      renderItem={({ item }) => <ReviewItem review={item} onDelete={false} onView={false}/>}
       keyExtractor={item => item.id}
       ListHeaderComponent={() => (
         <>

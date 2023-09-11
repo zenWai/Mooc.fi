@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {FlatList, View, StyleSheet, ActivityIndicator, TouchableOpacity} from 'react-native';
+import React, {useCallback, useState} from 'react';
+import {FlatList, View, StyleSheet, ActivityIndicator, TouchableOpacity, TextInput} from 'react-native';
 import RepositoryItem from './RepositoryItem';
 import useRepositories from '../hooks/useRepositories';
 import OrderPicker from "./OrderPicker";
@@ -7,9 +7,15 @@ import SpecialText from "./theme/SpecialText";
 
 const ItemSeparator = () => <View style={styles.separator}/>;
 
-const RepositoryListHeader = ({ onSelectOrder, modalVisible, setModalVisible }) => {
+const RepositoryListHeader = ({ onSelectOrder, modalVisible, setModalVisible, searchKeyword, setSearchKeyword }) => {
   return (
     <>
+      <TextInput
+        value={searchKeyword}
+        onChangeText={text => setSearchKeyword(text)}
+        placeholder="Search by keyword"
+        style={{ padding: 10, borderColor: '#d3d3d3', borderWidth: 1, borderRadius: 5, margin: 4 }}
+      />
       <TouchableOpacity onPress={() => setModalVisible(true)}>
         <SpecialText style={{margin: 4}}>Select Order</SpecialText>
       </TouchableOpacity>
@@ -21,8 +27,17 @@ const RepositoryListHeader = ({ onSelectOrder, modalVisible, setModalVisible }) 
 const RepositoryList = () => {
   const [selectedOrder, setSelectedOrder] = useState("CREATED_AT_DESC");
   const [modalVisible, setModalVisible] = useState(false);
-  const { repositories, loading } = useRepositories(selectedOrder);
-
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const { repositories, loading } = useRepositories(selectedOrder, searchKeyword);
+  const renderHeader = useCallback(() => (
+    <RepositoryListHeader
+      onSelectOrder={setSelectedOrder}
+      modalVisible={modalVisible}
+      setModalVisible={setModalVisible}
+      searchKeyword={searchKeyword}
+      setSearchKeyword={setSearchKeyword}
+    />
+  ), [modalVisible, searchKeyword, setSelectedOrder, setModalVisible, setSearchKeyword]);
   const repositoryNodes = repositories
     ? repositories.edges.map(edge => edge.node)
     : [];
@@ -47,11 +62,7 @@ const RepositoryList = () => {
       <FlatList
         data={repositoryNodes}
         ItemSeparatorComponent={ItemSeparator}
-        ListHeaderComponent={<RepositoryListHeader
-          onSelectOrder={setSelectedOrder}
-          modalVisible={modalVisible}
-          setModalVisible={setModalVisible}
-        />}
+        ListHeaderComponent={renderHeader}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />

@@ -24,6 +24,9 @@ const AppBar = () => {
         {data && data.me ? (
           // User is authenticated
           <>
+            <Link to="/myReviews" underlayColor="#f0f4f7" style={{ margin: 8 }}>
+              <Title style={{ color: 'white' }}>My Reviews</Title>
+            </Link>
             <Link to="/createreview" underlayColor="#f0f4f7" style={{ margin: 8 }}>
               <Title style={{ color: 'white' }}>Create a Review</Title>
             </Link>

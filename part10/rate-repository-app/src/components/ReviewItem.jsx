@@ -1,7 +1,7 @@
-import {View, StyleSheet} from "react-native";
+import {View, StyleSheet, Alert, Button} from "react-native";
 import Text from '../components/theme/Text'
 
-const ReviewItem = ({ review }) => {
+const ReviewItem = ({ review, onDelete, onView }) => {
   // DD/MM/YYYY
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -9,15 +9,43 @@ const ReviewItem = ({ review }) => {
     return date.toLocaleDateString(undefined, options);
   }
 
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Review',
+      'Are you sure you want to delete this review?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: () => onDelete(review.id) },
+      ],
+      { cancelable: false }
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.ratingCircle}>
         <Text style={styles.ratingText}>{review.rating}</Text>
       </View>
       <View style={styles.infoContainer}>
-        <Text fontWeight="bold" fontSize="subheading">{review.user.username}</Text>
+        {onView && onDelete ?
+          (
+            <Text fontWeight="bold" fontSize="subheading">{review.repository.fullName}</Text>
+          ) : (
+            <Text fontWeight="bold" fontSize="subheading">{review.user.username}</Text>
+          )
+        }
         <Text color="textSecondary">{formatDate(review.createdAt)}</Text>
         <Text color="textSecondary">{review.text}</Text>
+        {onView && onDelete &&
+          <>
+            <Button title="View Repository" onPress={() => onView(review.repositoryId)}/>
+            <Button title="Delete Review" onPress={handleDelete}/>
+          </>
+        }
       </View>
     </View>
   );
